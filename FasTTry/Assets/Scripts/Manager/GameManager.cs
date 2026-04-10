@@ -5,12 +5,12 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
-    [Header("Estadísticas de la partida")]  // ← AGREGAR ESTO
+    [Header("Estadísticas de la partida")]  
     public int enemiesKilledThisMatch = 0;
     public int spinsUsedThisMatch = 0;
 
     [Header("Game State")]
-    public bool isGameActive = false;  // ← EMPIEZA EN FALSE
+    public bool isGameActive = false;  
     public float gameSpeed = 1f;
 
     [Header("Player Stats")]
@@ -44,8 +44,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        // ❌ NO LLAMAR StartGame() aquí
-        // El juego empezará cuando MenusControles llame a StartGame()
+        
         Debug.Log("GameManager listo. Esperando a que presiones Play...");
     }
 
@@ -84,8 +83,8 @@ public class GameManager : MonoBehaviour
             WeaponManager.Instance.ResetWeaponManager();
         }
 
-        // ← AGREGAR ESTO:
-        // Limpiar enemigos de la escena
+       
+        // Limpiar enemigos de la escena pa evitar bugs
         LimpiarEnemigos();
     }
 
@@ -157,7 +156,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("❌ MenusControles no encontrado!");
+            Debug.LogError("MenusControles no encontrado");
         }
     }
     public void PlayerTakeDamage(int damage = 1)
@@ -165,7 +164,7 @@ public class GameManager : MonoBehaviour
         // ✨ VERIFICAR INVENCIBILIDAD PRIMERO
         if (WeaponManager.Instance != null && WeaponManager.Instance.IsInvincible())
         {
-            Debug.Log("💎 ¡DAÑO BLOQUEADO POR ESCUDO DIAMANTE!");
+            Debug.Log("DAÑO BLOQUEADO POR ESCUDO DIAMANTE");
             return;  // No recibe daño
         }
 
@@ -193,7 +192,7 @@ public class GameManager : MonoBehaviour
     public void RegisterSpinUsed()
     {
         spinsUsedThisMatch++;
-        Debug.Log($"🎰 Spins usados esta partida: {spinsUsedThisMatch}");
+        Debug.Log($"Spins usados esta partida: {spinsUsedThisMatch}");
     }
 
     private void UpdateDifficulty()
@@ -207,7 +206,7 @@ public class GameManager : MonoBehaviour
     {
         Time.timeScale = 1f;
 
-        Debug.Log("🔄 Reiniciando juego...");
+        Debug.Log("Reiniciando juego...");
 
         StartGame();
     }

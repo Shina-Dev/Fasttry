@@ -23,7 +23,7 @@ public class MenusControles : MonoBehaviour
     public TextMeshProUGUI textDistancia;          // Esta partida
     public TextMeshProUGUI textEnemigos;           // Esta partida
     public TextMeshProUGUI textSpins;              // Esta partida
-    public GameObject textNewRecord;               // "¡NUEVO RÉCORD!" (opcional)
+    public GameObject textNewRecord;               
 
     [Header("Configuración")]
     public float tiempoGameOver = 2f;   // Tiempo antes de mostrar estadísticas
@@ -83,13 +83,13 @@ public class MenusControles : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning("⚠️ StatsDatabase no encontrado al actualizar récord del menú");
+                Debug.LogWarning("StatsDatabase no encontrado al actualizar récord del menú");
                 textRecordInicio.text = "RÉCORD: 0.00 KM";
             }
         }
         else
         {
-            Debug.LogWarning("⚠️ textRecordInicio no está asignado en el Inspector");
+            Debug.LogWarning("textRecordInicio no está asignado en el Inspector");
         }
     }
 
@@ -98,7 +98,7 @@ public class MenusControles : MonoBehaviour
     /// </summary>
     public void StartGame()
     {
-        Debug.Log("🎮 Botón Play presionado!");
+        Debug.Log("Botón Play presionado");
 
         // ← AGREGAR: Sonido de botón
         if (AudioManager.Instance != null)
@@ -127,7 +127,7 @@ public class MenusControles : MonoBehaviour
         }
         else
         {
-            Debug.LogError("❌ GameManager no encontrado!");
+            Debug.LogError("GameManager no encontrado");
         }
     }
 
@@ -162,7 +162,7 @@ public class MenusControles : MonoBehaviour
         if (panelEstadisticas != null)
             panelEstadisticas.SetActive(false);
 
-        Debug.Log("💀 GAME OVER mostrado");
+        Debug.Log("GAME OVER mostrado");
 
         // Esperar 2 segundos (usa Realtime porque Time.timeScale = 0)
         yield return new WaitForSecondsRealtime(tiempoGameOver);
@@ -184,7 +184,7 @@ public class MenusControles : MonoBehaviour
     {
         if (StatsDatabase.Instance == null)
         {
-            Debug.LogWarning("⚠️ StatsDatabase no encontrado");
+            Debug.LogWarning("StatsDatabase no encontrado");
             return;
         }
 
@@ -226,7 +226,7 @@ public class MenusControles : MonoBehaviour
     /// </summary>
     public void Reintentar()
     {
-        Debug.Log("🔄 Reintentar presionado");
+        Debug.Log("Reintentar presionado");
 
         // ← AGREGAR: Sonido de botón
         if (AudioManager.Instance != null)
@@ -256,7 +256,7 @@ public class MenusControles : MonoBehaviour
     /// </summary>
     public void VolverAlMenu()
     {
-        Debug.Log("🏠 Volver al menú");
+        Debug.Log("Volver al menú");
 
         // ← AGREGAR: Detener coroutines de Game Over
         StopAllCoroutines();
@@ -293,6 +293,6 @@ public class MenusControles : MonoBehaviour
         // Actualizar récord al volver al menú
         ActualizarRecordInicio();
 
-        Debug.Log("✅ Vuelto al menú - Todo reseteado");
+        Debug.Log("Vuelto al menú - Todo reseteado");
     }
 }

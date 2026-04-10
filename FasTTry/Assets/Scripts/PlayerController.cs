@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
     [Header("Movement Type")]
     [SerializeField] private bool useLaneSystem = true;
 
-    [Header("Shield Effect")]  // ← NUEVO
+    [Header("Shield Effect")]  
     [SerializeField] private float shieldPulseSpeed = 4f;
     [SerializeField] private float shieldMinAlpha = 0.3f;
     [SerializeField] private float shieldMaxAlpha = 1f;
@@ -22,7 +22,7 @@ public class PlayerController : MonoBehaviour
     private float horizontalInput;
     private bool canMove = true;
 
-    // ← NUEVO: Variables para efecto de escudo
+    // Variables para efecto de escudo
     private SpriteRenderer spriteRenderer;
     private Color originalColor;
     private bool wasInvincible = false;
@@ -58,10 +58,10 @@ public class PlayerController : MonoBehaviour
 
         HandleInput();
         HandleMovement();
-        UpdateShieldEffect();  // ← NUEVO
+        UpdateShieldEffect();  
     }
 
-    // ← NUEVO: Método para actualizar efecto visual de escudo
+   
     private void UpdateShieldEffect()
     {
         if (WeaponManager.Instance == null || spriteRenderer == null) return;
