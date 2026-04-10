@@ -1,3 +1,2 @@
 # Fasttry
-## GDD
-- [Ver GDD (PDF)](docs/GDD_FastTry.pdf)
+- [Ver GDD](GDD/Fasttry%20GDD.pdf)
