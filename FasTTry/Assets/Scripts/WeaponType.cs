@@ -14,10 +14,10 @@ public enum WeaponType
 
     // TIER 2 - Mejoradas
     GuidedMissiles,
-    HealthBoost,      // ← NUEVO: +1 vida (antes PiercingShot)
+    HealthBoost,     
     LaserBeam,
-    HealthRestore,    // ← NUEVO: +2 vidas (antes NovaBlast)
-    BonusLife,        // ← NUEVO: +1 vida extra 4ta (antes LuckyStrike)
+    HealthRestore,   
+  
 
     // TIER 3 - Épicas
     JackpotLaser,

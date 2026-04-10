@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.UI;
 
 public class HealthUI : MonoBehaviour
@@ -6,27 +6,41 @@ public class HealthUI : MonoBehaviour
     [Header("Heart Sprites")]
     [SerializeField] private Sprite heartFull;
     [SerializeField] private Sprite heartEmpty;
-    [SerializeField] private Sprite heartBonus;  // Corazón extra (diferente color)
 
     [Header("Heart Images")]
-    [SerializeField] private Image[] hearts = new Image[4];  // 3 normales + 1 bonus
+    [SerializeField] private Image[] hearts = new Image[4];
+
+    [Header("Diamond Shield")]
+    [SerializeField] private Image shieldIconEmpty; 
+    [SerializeField] private Image shieldIconFull;
 
     private int lastKnownHealth = 3;
+    private bool lastKnownShield = false;
 
     private void Start()
     {
+        if (shieldIconEmpty != null)
+            shieldIconEmpty.enabled = true;
         UpdateHearts();
+        UpdateShield();
     }
 
     private void Update()
     {
         if (GameManager.Instance == null) return;
 
-        // Solo actualizar si la vida cambió
         if (GameManager.Instance.playerLives != lastKnownHealth)
         {
             lastKnownHealth = GameManager.Instance.playerLives;
             UpdateHearts();
+        }
+
+        // Verificar cambio de escudo
+        bool shieldActive = WeaponManager.Instance != null && WeaponManager.Instance.IsInvincible();
+        if (shieldActive != lastKnownShield)
+        {
+            lastKnownShield = shieldActive;
+            UpdateShield();
         }
     }
 
@@ -36,41 +50,39 @@ public class HealthUI : MonoBehaviour
 
         int currentLives = GameManager.Instance.playerLives;
 
-        // Actualizar cada corazón
         for (int i = 0; i < hearts.Length; i++)
         {
             if (hearts[i] == null) continue;
 
             if (i < 3)
             {
-                // Corazones normales (1-3)
-                if (i < currentLives)
-                {
-                    hearts[i].sprite = heartFull;
-                    hearts[i].enabled = true;
-                    hearts[i].color = Color.white;
-                }
-                else
-                {
-                    hearts[i].sprite = heartEmpty;
-                    hearts[i].enabled = true;
-                    hearts[i].color = new Color(1f, 1f, 1f, 0.3f);  // Semi-transparente
-                }
+                hearts[i].sprite = i < currentLives ? heartFull : heartEmpty;
+                hearts[i].enabled = true;
+                hearts[i].color = i < currentLives ? Color.white : new Color(1f, 1f, 1f, 0.3f);
             }
             else
             {
-                // Corazón bonus (4to)
                 if (currentLives >= 4)
                 {
-                    hearts[i].sprite = heartBonus;
+
                     hearts[i].enabled = true;
-                    hearts[i].color = Color.cyan;  // Color especial
+                    hearts[i].color = Color.cyan;
                 }
                 else
                 {
-                    hearts[i].enabled = false;  // Oculto si no se tiene
+                    hearts[i].enabled = false;
                 }
             }
         }
+    }
+
+    private void UpdateShield()
+    {
+        bool isActive = WeaponManager.Instance != null && WeaponManager.Instance.IsInvincible();
+
+        // NUNCA tocar shieldIconEmpty aquÃ­
+        // Solo manejar el relleno
+        if (shieldIconFull != null)
+            shieldIconFull.enabled = isActive;
     }
 }

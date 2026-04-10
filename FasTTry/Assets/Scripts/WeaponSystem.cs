@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class WeaponSystem : MonoBehaviour
 {
@@ -66,17 +66,8 @@ public class WeaponSystem : MonoBehaviour
 
         switch (currentWeaponType)
         {
-            // Power-ups de vida (no disparan)
             case WeaponType.HealthBoost:
-                ShootBasic();
-                break;
             case WeaponType.HealthRestore:
-                ShootBasic();
-                break;
-            case WeaponType.BonusLife:
-                ShootBasic();
-                break;
-
             case WeaponType.Basic:
             case WeaponType.QuadCherry:
             case WeaponType.CherryBoost:
@@ -84,6 +75,7 @@ public class WeaponSystem : MonoBehaviour
             case WeaponType.CritCannon:
             case WeaponType.CherryBomb:
             case WeaponType.UltimateShot:
+            case WeaponType.EMPBomb:
                 ShootBasic();
                 break;
 
@@ -93,8 +85,11 @@ public class WeaponSystem : MonoBehaviour
                 break;
 
             case WeaponType.StarBurst:
-            case WeaponType.SeekingStars:
                 ShootTriple();
+                break;
+
+            case WeaponType.SeekingStars:
+                StartCoroutine(ShootSeekingStars());
                 break;
 
             case WeaponType.ScatterStorm:
@@ -106,9 +101,8 @@ public class WeaponSystem : MonoBehaviour
                 ShootLaser();
                 break;
 
-            case WeaponType.EMPBomb:
             case WeaponType.DiamondShield:
-                ShootArea();
+                ShootBasic();
                 break;
 
             default:
@@ -140,7 +134,7 @@ public class WeaponSystem : MonoBehaviour
 
     private void ShootSpread()
     {
-        int count = currentWeaponType == WeaponType.ScatterStorm ? 7 : 5;
+        int count = 7;
         float spreadAngle = 40f;
         float angleStep = spreadAngle / (count - 1);
         float startAngle = -spreadAngle / 2f;
@@ -153,6 +147,15 @@ public class WeaponSystem : MonoBehaviour
         }
     }
 
+    private System.Collections.IEnumerator ShootSeekingStars()
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            SpawnProjectile(firePoint.position, firePoint.rotation);
+            yield return new WaitForSeconds(0.12f);
+        }
+    }
+
     private void ShootLaser()
     {
         for (int i = 0; i < 3; i++)
@@ -161,31 +164,54 @@ public class WeaponSystem : MonoBehaviour
         }
     }
 
-    private void ShootArea()
-    {
-        ShootBasic();
-    }
-
     private void SpawnProjectile(Vector3 position, Quaternion rotation)
     {
-        if (ObjectPool.Instance != null)
+        if (ObjectPool.Instance == null) return;
+
+        GameObject projectileGO = ObjectPool.Instance.SpawnFromPool("Projectile", position, rotation);
+
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayPlayerShoot();
+
+        if (projectileGO == null) return;
+
+        Projectile proj = projectileGO.GetComponent<Projectile>();
+        if (proj == null) return;
+
+        // Daño base
+        proj.SetDamage(Mathf.RoundToInt(1 * damageMultiplier));
+
+        // Resetear propiedades especiales
+        proj.SetHoming(false);
+        proj.SetPiercing(false);
+        proj.SetSplash(false);
+
+        // Aplicar propiedades según arma
+        switch (currentWeaponType)
         {
-            GameObject projectile = ObjectPool.Instance.SpawnFromPool("Projectile", position, rotation);
+            case WeaponType.GuidedMissiles:
+                proj.SetHoming(true, 5f);
+                break;
 
-            // ? AGREGAR: Sonido de disparo
-            if (AudioManager.Instance != null)
-            {
-                AudioManager.Instance.PlayPlayerShoot();
-            }
+            case WeaponType.SeekingStars:
+                proj.SetHomingSoft(true);
+                break;
 
-            if (projectile != null && damageMultiplier != 1f)
-            {
-                Projectile proj = projectile.GetComponent<Projectile>();
-                if (proj != null)
-                {
-                    proj.SetDamage(Mathf.RoundToInt(1 * damageMultiplier));
-                }
-            }
+            case WeaponType.CritCannon:
+                proj.SetColorOverride(new Color(1f, 0.5f, 0f));
+                break;
+
+            case WeaponType.UltimateShot:
+                proj.SetColorOverride(new Color(1f, 0.15f, 0.15f));
+                break;
+
+            case WeaponType.RapidDiamond:
+                proj.SetPiercing(true);
+                break;
+
+            case WeaponType.CherryBomb:
+                proj.SetSplash(true, 1.5f, Mathf.RoundToInt(1 * damageMultiplier));
+                break;
         }
     }
 

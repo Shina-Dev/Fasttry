@@ -27,11 +27,13 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        // Singleton pattern
         if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+
+           
+            Screen.SetResolution(1080, 1920, FullScreenMode.Windowed);
         }
         else
         {

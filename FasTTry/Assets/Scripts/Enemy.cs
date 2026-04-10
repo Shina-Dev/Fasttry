@@ -22,6 +22,7 @@ public class Enemy : MonoBehaviour, IPooledObject
     private Rigidbody2D rb;
     private bool isActive = false;
     private bool hasReachedPosition = false;
+    private bool IsFrozen = false;
     private float nextFireTime = 0f;
     private float moveSpeed = 3f;
     private Transform playerTransform;
@@ -74,6 +75,7 @@ public class Enemy : MonoBehaviour, IPooledObject
     {
         if (!isActive) return;
         if (GameManager.Instance == null || !GameManager.Instance.isGameActive) return;
+        if (IsFrozen) return;
 
         if (hasReachedPosition)
         {
@@ -88,6 +90,7 @@ public class Enemy : MonoBehaviour, IPooledObject
     private void FixedUpdate()
     {
         if (!isActive) return;
+        if (IsFrozen) { rb.linearVelocity = Vector2.zero; return; }
 
         if (!hasReachedPosition)
         {
@@ -363,5 +366,36 @@ public class Enemy : MonoBehaviour, IPooledObject
             Gizmos.DrawWireSphere(firePoint.position, 0.15f);
             Gizmos.DrawLine(firePoint.position, firePoint.position + Vector3.down * 0.5f);
         }
+    }
+
+    public void FreezeEnemy(float duration)
+    {
+        if (!IsFrozen && gameObject.activeInHierarchy)
+            StartCoroutine(FreezeRoutine(duration));
+    }
+
+    private System.Collections.IEnumerator FreezeRoutine(float duration)
+    {
+        IsFrozen = true;
+        SpriteRenderer sprite = GetComponent<SpriteRenderer>();
+
+        // Guardar color ANTES de congelar
+        Color originalColor = sprite != null ? sprite.color : Color.white;
+
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            if (sprite != null)
+            {
+                float t = Mathf.PingPong(elapsed * 8f, 1f);
+                sprite.color = Color.Lerp(Color.cyan, Color.white, t);
+            }
+            yield return null;
+        }
+
+        IsFrozen = false;
+        // Restaurar color original exacto
+        if (sprite != null) sprite.color = originalColor;
     }
 }

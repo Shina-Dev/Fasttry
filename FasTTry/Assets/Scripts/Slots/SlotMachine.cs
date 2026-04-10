@@ -27,7 +27,7 @@ public class SlotMachine : MonoBehaviour
     public bool isSpinning = false;
 
     private float lastSpinTime = 0f;
-    private readonly int[] symbolWeights = { 50, 30, 15, 5 };
+    private readonly int[] symbolWeights = { 40, 30, 20, 10 };
     private int totalWeight;
 
     public delegate void OnSpinComplete(SymbolType[] results);
@@ -208,7 +208,7 @@ public class SlotMachine : MonoBehaviour
         if (cherries == 3 && sevens == 1) return WeaponType.HealthBoost;      // +1 vida
         if (stars == 3 && sevens == 1) return WeaponType.LaserBeam;
         if (stars == 2 && sevens == 2) return WeaponType.HealthRestore;       // +2 vidas
-        if (stars == 1 && sevens == 3) return WeaponType.BonusLife;           // +1 vida (4ta)
+        if (stars == 1 && sevens == 3) return WeaponType.UltimateShot;
 
         // TIER 1 - BÁSICAS (Cherry + Star)
         if (cherries == 4) return WeaponType.QuadCherry;

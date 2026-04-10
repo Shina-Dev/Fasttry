@@ -47,7 +47,29 @@ public class WeaponManager : MonoBehaviour
             }
         }
     }
+#if UNITY_EDITOR
+    private void OnGUI()
+    {
+        GUILayout.BeginArea(new Rect(10, 10, 200, 600));
 
+        foreach (WeaponType weapon in System.Enum.GetValues(typeof(WeaponType)))
+        {
+            if (GUILayout.Button(weapon.ToString()))
+            {
+                ActivateWeapon(weapon, new Dictionary<SlotMachine.SymbolType, int>());
+            }
+        }
+
+        GUILayout.Label($"Arma: {currentWeaponType}");
+        GUILayout.Label($"Tiempo restante: {GetWeaponTimeRemaining():F1}s");
+        GUILayout.Label($"Daño x{GetDamageMultiplier()}");
+        GUILayout.Label($"FireRate x{GetFireRateMultiplier()}");
+        GUILayout.Label($"Proyectiles: {GetProjectileCount()}");
+        GUILayout.Label($"Invencible: {IsInvincible()}");
+
+        GUILayout.EndArea();
+    }
+#endif
     public void ActivateWeapon(WeaponType weaponType, Dictionary<SlotMachine.SymbolType, int> combination)
     {
         Debug.Log($"====> ACTIVANDO ARMA: {weaponType} <====");
@@ -105,12 +127,20 @@ public class WeaponManager : MonoBehaviour
                 Debug.Log("💚💚 HEALTH RESTORE: +2 vidas!");
                 break;
 
-            case WeaponType.BonusLife:
-                // ⭐7️⃣7️⃣7️⃣ → +1 vida extra (4ta vida)
-                GiveHealth(1, allowBonus: true);
-                Debug.Log("💙 BONUS LIFE: ¡Vida extra desbloqueada!");
-                break;
+           
         }
+    }
+
+    private void TriggerEMPEffect()
+    {
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        foreach (GameObject enemyGO in enemies)
+        {
+            Enemy enemy = enemyGO.GetComponent<Enemy>();
+            if (enemy != null)
+                enemy.FreezeEnemy(4f);
+        }
+        Debug.Log("⚡ EMP activado!");
     }
 
     private void ConfigureWeapon(WeaponType weaponType)
@@ -123,12 +153,12 @@ public class WeaponManager : MonoBehaviour
             // TIER 1 - BÁSICAS (Cherry + Star)
             case WeaponType.QuadCherry:
                 projectileCount = 4;
-                fireRateMultiplier = 1.2f;
+                fireRateMultiplier = 1.5f;
                 break;
 
             case WeaponType.CherryBoost:
                 projectileCount = 1;
-                fireRateMultiplier = 1.5f;
+                fireRateMultiplier = 2.2f;
                 break;
 
             case WeaponType.TwinShot:
@@ -162,10 +192,7 @@ public class WeaponManager : MonoBehaviour
                 currentWeaponDuration = 0f;  // Efecto instantáneo
                 break;
 
-            case WeaponType.BonusLife:
-                // Power-up de vida: no dispara, da +1 vida extra (4ta)
-                currentWeaponDuration = 0f;  // Efecto instantáneo
-                break;
+         
 
             // TIER 3 - ÉPICAS (Seven + Diamond)
             case WeaponType.JackpotLaser:
@@ -182,6 +209,7 @@ public class WeaponManager : MonoBehaviour
 
             case WeaponType.EMPBomb:
                 currentWeaponDuration = 4f;
+                TriggerEMPEffect();  // ← Se llama UNA sola vez al activar
                 break;
 
             case WeaponType.CritCannon:

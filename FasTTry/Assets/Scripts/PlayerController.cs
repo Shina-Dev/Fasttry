@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.InputSystem.LowLevel;
 
 public class PlayerController : MonoBehaviour
 {
@@ -26,6 +27,10 @@ public class PlayerController : MonoBehaviour
     private Color originalColor;
     private bool wasInvincible = false;
     private float shieldTimer = 0f;
+    private float touchStartX;
+    private float touchStartY;
+    private float lastMoveTime = 0f;
+    private const float MOVE_COOLDOWN = 0.3f;
 
     private void Start()
     {
@@ -96,42 +101,49 @@ public class PlayerController : MonoBehaviour
 
     private void HandleInput()
     {
-        if (useLaneSystem)
-        {
-            if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
-            {
-                MoveLane(-1);
-            }
-            else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
-            {
-                MoveLane(1);
-            }
+        if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
+            MoveLane(-1);
+        else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
+            MoveLane(1);
 
-            if (Input.touchCount > 0)
+        if (Input.touchCount > 0)
+        {
+            Touch touch = Input.GetTouch(0);
+
+            if (touch.position.y < Screen.height * 0.20f) return;
+
+            if (touch.phase == TouchPhase.Began)
             {
-                Touch touch = Input.GetTouch(0);
-                if (touch.phase == TouchPhase.Began)
+                touchStartX = touch.position.x;
+                touchStartY = touch.position.y;
+            }
+            else if (touch.phase == TouchPhase.Moved)
+            {
+                float swipeDelta = touch.position.x - touchStartX;
+
+                if (Mathf.Abs(swipeDelta) > 80f && Time.time > lastMoveTime + MOVE_COOLDOWN)
+                {
+                    if (swipeDelta > 0)
+                        MoveLane(1);
+                    else
+                        MoveLane(-1);
+
+                    lastMoveTime = Time.time;
+                    touchStartX = touch.position.x;
+                }
+            }
+            else if (touch.phase == TouchPhase.Ended)
+            {
+                float swipeDelta = touch.position.x - touchStartX;
+
+                // Si fue un tap (poco movimiento)
+                if (Mathf.Abs(swipeDelta) < 20f)
                 {
                     if (touch.position.x < Screen.width / 2)
                         MoveLane(-1);
                     else
                         MoveLane(1);
                 }
-            }
-        }
-        else
-        {
-            horizontalInput = Input.GetAxisRaw("Horizontal");
-
-            if (Input.touchCount > 0)
-            {
-                Touch touch = Input.GetTouch(0);
-                if (touch.position.x < Screen.width / 3)
-                    horizontalInput = -1f;
-                else if (touch.position.x > Screen.width * 2f / 3f)
-                    horizontalInput = 1f;
-                else
-                    horizontalInput = 0f;
             }
         }
     }
