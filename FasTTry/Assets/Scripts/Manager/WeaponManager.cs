@@ -45,27 +45,39 @@ public class WeaponManager : MonoBehaviour
                 Debug.Log($"Arma {currentWeaponType} expiró después de {WEAPON_DURATION}s");
                 DeactivateWeapon();
             }
+
         }
     }
 #if UNITY_EDITOR
+    private bool menuExpanded = true;
+
     private void OnGUI()
     {
-        GUILayout.BeginArea(new Rect(10, 10, 200, 600));
+        GUILayout.BeginArea(new Rect(10, 10, 210, menuExpanded ? 600 : 30));
 
-        foreach (WeaponType weapon in System.Enum.GetValues(typeof(WeaponType)))
+        // Botón para plegar/desplegar
+        if (GUILayout.Button(menuExpanded ? "▼ DEBUG WEAPONS" : "▶ DEBUG WEAPONS"))
         {
-            if (GUILayout.Button(weapon.ToString()))
-            {
-                ActivateWeapon(weapon, new Dictionary<SlotMachine.SymbolType, int>());
-            }
+            menuExpanded = !menuExpanded;
         }
 
-        GUILayout.Label($"Arma: {currentWeaponType}");
-        GUILayout.Label($"Tiempo restante: {GetWeaponTimeRemaining():F1}s");
-        GUILayout.Label($"Daño x{GetDamageMultiplier()}");
-        GUILayout.Label($"FireRate x{GetFireRateMultiplier()}");
-        GUILayout.Label($"Proyectiles: {GetProjectileCount()}");
-        GUILayout.Label($"Invencible: {IsInvincible()}");
+        if (menuExpanded)
+        {
+            foreach (WeaponType weapon in System.Enum.GetValues(typeof(WeaponType)))
+            {
+                if (GUILayout.Button(weapon.ToString()))
+                {
+                    ActivateWeapon(weapon, new Dictionary<SlotMachine.SymbolType, int>());
+                }
+            }
+
+            GUILayout.Label($"Arma: {currentWeaponType}");
+            GUILayout.Label($"Tiempo restante: {GetWeaponTimeRemaining():F1}s");
+            GUILayout.Label($"Daño x{GetDamageMultiplier()}");
+            GUILayout.Label($"FireRate x{GetFireRateMultiplier()}");
+            GUILayout.Label($"Proyectiles: {GetProjectileCount()}");
+            GUILayout.Label($"Invencible: {IsInvincible()}");
+        }
 
         GUILayout.EndArea();
     }

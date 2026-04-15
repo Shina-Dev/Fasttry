@@ -10,9 +10,15 @@ public class MenusControles : MonoBehaviour
     public GameObject menuPanel;        // Panel del menú principal
     public GameObject gamePanel;        // Panel del juego (HUD)
     public GameObject gameOverPanel;    // Panel de Game Over completo
+    public GameObject configPanel;
+
 
     [Header("Menu Principal")]
     public TextMeshProUGUI textRecordInicio;  // ← Texto del récord en el menú
+  
+    [Header("Config Panel")]
+    public UnityEngine.UI.Slider musicSlider;
+    public UnityEngine.UI.Slider sfxSlider;
 
     [Header("Game Over - Fase 1: Texto rojo")]
     public GameObject textGameOver;     // "GAME OVER" en rojo
@@ -294,5 +300,55 @@ public class MenusControles : MonoBehaviour
         ActualizarRecordInicio();
 
         Debug.Log("Vuelto al menú - Todo reseteado");
+    }
+    public void AbrirConfig()
+    {
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayButtonClick();
+
+        if (configPanel != null)
+            configPanel.SetActive(true);
+
+        if (AudioManager.Instance != null)
+        {
+            // Desuscribir temporalmente para no triggerear el evento al setear valor
+            if (musicSlider != null)
+            {
+                musicSlider.onValueChanged.RemoveAllListeners();
+                musicSlider.value = AudioManager.Instance.musicVolume;
+                musicSlider.onValueChanged.AddListener(OnMusicVolumeChanged);
+            }
+            if (sfxSlider != null)
+            {
+                sfxSlider.onValueChanged.RemoveAllListeners();
+                sfxSlider.value = AudioManager.Instance.sfxVolume;
+                sfxSlider.onValueChanged.AddListener(OnSFXVolumeChanged);
+            }
+        }
+    }
+    public void CerrarConfig()
+    {
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayButtonClick();
+
+        if (musicSlider != null)
+            musicSlider.onValueChanged.RemoveAllListeners();
+        if (sfxSlider != null)
+            sfxSlider.onValueChanged.RemoveAllListeners();
+
+        if (configPanel != null)
+            configPanel.SetActive(false);
+    }
+
+    public void OnMusicVolumeChanged(float value)
+    {
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.SetMusicVolume(value);
+    }
+
+    public void OnSFXVolumeChanged(float value)
+    {
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.SetSFXVolume(value);
     }
 }

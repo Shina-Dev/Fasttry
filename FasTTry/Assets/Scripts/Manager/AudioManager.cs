@@ -43,7 +43,14 @@ public class AudioManager : MonoBehaviour
             return;
         }
 
-        // Configurar fuentes de audio
+        // Cargar valores guardados
+        musicVolume = PlayerPrefs.GetFloat("MusicVolume", 0.5f);
+        sfxVolume = PlayerPrefs.GetFloat("SFXVolume", 0.7f);
+
+        if (musicVolume <= 0f) musicVolume = 0.5f;
+        if (sfxVolume <= 0f) sfxVolume = 0.7f;
+
+        // Configurar fuentes
         if (musicSource != null)
         {
             musicSource.loop = true;
@@ -74,19 +81,16 @@ public class AudioManager : MonoBehaviour
         if (musicSource == null || clip == null) return;
 
         if (musicSource.clip == clip && musicSource.isPlaying)
-            return; // Ya está sonando esta música
+            return;
 
         musicSource.clip = clip;
-        musicSource.volume = musicVolume;
         musicSource.Play();
     }
 
     public void StopMusic()
     {
         if (musicSource != null)
-        {
             musicSource.Stop();
-        }
     }
 
     // ==================== SFX UI ====================
@@ -98,7 +102,7 @@ public class AudioManager : MonoBehaviour
 
     public void PlaySpinButton()
     {
-        PlaySFX(spinButtonSFX, 0.8f); // Un poco más bajo para que no sature
+        PlaySFX(spinButtonSFX, 0.8f);
     }
 
     public void PlayGameOverSound()
@@ -110,7 +114,7 @@ public class AudioManager : MonoBehaviour
 
     public void PlayPlayerShoot()
     {
-        PlaySFX(playerShootSFX, 0.5f); // Más bajo porque dispara seguido
+        PlaySFX(playerShootSFX, 0.5f);
     }
 
     public void PlayPlayerHit()
@@ -135,12 +139,11 @@ public class AudioManager : MonoBehaviour
         PlaySFX(enemyDeathSFX);
     }
 
-    // ==================== MÉTODOS AUXILIARES ====================
+    // ==================== AUXILIARES ====================
 
     private void PlaySFX(AudioClip clip, float volumeScale = 1f)
     {
         if (sfxSource == null || clip == null) return;
-
         sfxSource.PlayOneShot(clip, sfxVolume * volumeScale);
     }
 
@@ -148,30 +151,29 @@ public class AudioManager : MonoBehaviour
     {
         musicVolume = Mathf.Clamp01(volume);
         if (musicSource != null)
-        {
             musicSource.volume = musicVolume;
-        }
+        PlayerPrefs.SetFloat("MusicVolume", musicVolume);
+        PlayerPrefs.Save();
     }
 
     public void SetSFXVolume(float volume)
     {
         sfxVolume = Mathf.Clamp01(volume);
+        if (sfxSource != null)
+            sfxSource.volume = sfxVolume;
+        PlayerPrefs.SetFloat("SFXVolume", sfxVolume);
+        PlayerPrefs.Save();
     }
 
-    // Método para pausar/reanudar música
     public void PauseMusic()
     {
         if (musicSource != null && musicSource.isPlaying)
-        {
             musicSource.Pause();
-        }
     }
 
     public void ResumeMusic()
     {
         if (musicSource != null && !musicSource.isPlaying)
-        {
             musicSource.UnPause();
-        }
     }
 }
